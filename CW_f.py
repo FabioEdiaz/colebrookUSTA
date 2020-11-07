@@ -20,6 +20,12 @@ error = 1e4
 # ==============================================================================
 def CW_pf(Rey, D, k):
 
+    tol = 1e-4
+    x = 1000
+    f0 = 0.1
+    error = 1e4
+
+
     i = 1
     while error > tol:
 
@@ -37,15 +43,18 @@ def CW_pf(Rey, D, k):
 # ==============================================================================
 def CW_NRs(Rey, D, k):
 
+    tol = 1e-4
+    x0 = 1000
+    err = 1e4
     it = 1
 
     # Calculo de f(x)
     def g(x):
-    return (x + 2 * np.log10((k / D) / 3.7 + (2.51 * x) / (Rey)))
+        return (x + 2 * np.log10((k / D) / 3.7 + (2.51 * x) / (Rey)))
 
     # Calculo de f'(x)
     def dg(x):
-    return 1 + 2.189 /((k * Rey / D / 3.7) + 2.51 * x)
+        return 1 + 2.1888442 /((k * Rey / D / 3.7) + 2.51 * x)
 
     # Iterando para halla solucion
     while err > tol:
@@ -56,29 +65,44 @@ def CW_NRs(Rey, D, k):
 
         f1 = (1 / x0) ** 2
         print ("iteración", it, "raíz aproximada:", f1)
-        it = it + 1
+        it += it
 
     return f1
 
 # ==============================================================================
-# Método de Newton Raphson - COMPLICADITO
+# Método de Newton Raphson - COMPLICADITO (no probado)
 # ==============================================================================
 
 def CW_NRc(Rey, D, k):
 
-    x0 = f0
+    tol = 1e-4
+    x0 = 0.1
+    err = 1e4
+    it = 1
+
+    A = (k / D) / 3.7
+    B = 2.52 / Rey
+    C = B * (1 / np.log(10))
 
     def h(x):
-    return (-2*np.log10((k / D)/3.7 + 2.51 / (Rey * np.sqrt(x)))-(1/np.sqrt(x)))
+
+        hx = x ** (-1 / 2) + 2 * np.log10(A + B * x ** (-1 / 2))
+        print(hx)
+
+        return hx
 
     def dh(x):
-    return (1.76964 * Rey * np.sqrt(x)) /(np.sqrt(x) * x) * 0.27027 * k/D + \
-            2.71 /(Rey * np.sqrt(x)) + 1//(2 * x ** (3 / 2))
+
+        hpx = -(x ** (-3 / 2)) * (0.5 + C / (A + B * x ** (-1 / 2)))
+
+        print(hpx)
+
+        return hpx
 
 
-    while error > 1e-8:
-        x1 = x0 -h(x0) / dh(x0)
-        error =abs(x1 - x0) / x0
+    while err > tol:
+        x1 = x0 - h(x0) / dh(x0)
+        err = abs(x1 - x0) / x0
         x0 = x1
         print ("iteración", it, "raíz aproximada:", x0)
         it += 1
